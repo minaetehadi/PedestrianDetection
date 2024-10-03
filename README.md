@@ -2,5 +2,5 @@
 PedestrianDetection
 
 # Acknowledgemnet
-https://github.com/pdollar/toolbox
-- [ART](https://github.com/Trusted-AI/adversarial-robustness-toolbox)
+- [pdollar-toolbox](https://github.com/pdollar/toolbox)
+- [ART-toolbox](https://github.com/Trusted-AI/adversarial-robustness-toolbox)
