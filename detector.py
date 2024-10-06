@@ -72,8 +72,7 @@ def load_and_process_data(video_file, labels):
         ret, frame = capture.read()
         if not ret:
             break
-        
-        # Extract ACF features for the current frame
+
         features = extract_acf_features(frame, prev_frame)
         X.append(features)
 
