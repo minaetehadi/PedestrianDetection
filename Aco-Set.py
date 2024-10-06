@@ -1,72 +1,81 @@
-import random as rn
 import numpy as np
-from numpy.random import choice as np_choice
 
-class AntColony(object):
-
-    def __init__(self, distances, n_ants, n_best, n_iterations, decay, alpha=1, beta=1):
+def initialize_pheromone(n_features):
    
-        self.distances  = distances
-        self.pheromone = np.ones(self.distances.shape) / len(distances)
-        self.all_inds = range(len(distances))
-        self.n_ants = n_ants
-        self.n_best = n_best
-        self.n_iterations = n_iterations
-        self.decay = decay
-        self.alpha = alpha
-        self.beta = beta
+    return np.ones((n_features, n_features))
 
-    def run(self):
-        shortest_path = None
-        all_time_shortest_path = ("placeholder", np.inf)
-        for i in range(self.n_iterations):
-            all_paths = self.gen_all_paths()
-            self.spread_pheronome(all_paths, self.n_best, shortest_path=shortest_path)
-            shortest_path = min(all_paths, key=lambda x: x[1])
-            print (shortest_path)
-            if shortest_path[1] < all_time_shortest_path[1]:
-                all_time_shortest_path = shortest_path            
-            self.pheromone = self.pheromone * self.decay            
-        return all_time_shortest_path
+def evaluate_subset(selected_features, feature_set, eval_func):
 
-    def spread_pheronome(self, all_paths, n_best, shortest_path):
-        sorted_paths = sorted(all_paths, key=lambda x: x[1])
-        for path, dist in sorted_paths[:n_best]:
-            for move in path:
-                self.pheromone[move] += 1.0 / self.distances[move]
+    subset = feature_set[selected_features == 1]
+    return eval_func(subset)
 
-    def gen_path_dist(self, path):
-        total_dist = 0
-        for ele in path:
-            total_dist += self.distances[ele]
-        return total_dist
+def update_pheromone(Tk, delta_tau, rho):
 
-    def gen_all_paths(self):
-        all_paths = []
-        for i in range(self.n_ants):
-            path = self.gen_path(0)
-            all_paths.append((path, self.gen_path_dist(path)))
-        return all_paths
+    return (1 - rho) * Tk + rho * delta_tau
 
-    def gen_path(self, start):
-        path = []
-        visited = set()
-        visited.add(start)
-        prev = start
-        for i in range(len(self.distances) - 1):
-            move = self.pick_move(self.pheromone[prev], self.distances[prev], visited)
-            path.append((prev, move))
-            prev = move
-            visited.add(move)
-        path.append((prev, start)) # going back to where we started    
-        return path
+def step_function(F, Tk, alpha, beta, current_feature, selected_features, inverse_correlation):
+   
+    n_features = len(F)
+    max_attractiveness = -1
+    next_feature = None
+    
+    for feature in range(n_features):
+        if selected_features[feature] == 0:  # Feature not yet selected
+            attractiveness = (Tk[current_feature, feature] ** alpha) * (inverse_correlation[current_feature, feature] ** beta)
+            if attractiveness > max_attractiveness:
+                max_attractiveness = attractiveness
+                next_feature = feature
+    
+    selected_features[next_feature] = 1  # Mark the feature as selected
+    return next_feature, selected_features
 
-    def pick_move(self, pheromone, dist, visited):
-        pheromone = np.copy(pheromone)
-        pheromone[list(visited)] = 0
+def ant_colony_optimization(F, m, Tk, inverse_corr, delta, rho, alpha, beta, max_iter, eval_func):
+   
+    n_features = len(F)
+    best_eval = -1
+    best_features = np.zeros(n_features)
+    
+    for iteration in range(max_iter):
+        delta_tau = np.zeros_like(Tk)
+        
+        for ant in range(m):
+            selected_features = np.zeros(n_features)
+            current_feature = np.random.randint(n_features)
+            selected_features[current_feature] = 1
+            
+            while np.sum(selected_features) < delta * n_features:
+                next_feature, selected_features = step_function(F, Tk, alpha, beta, current_feature, selected_features, inverse_corr)
+                delta_tau[current_feature, next_feature] += 1  # Update pheromone for the selected path
+                current_feature = next_feature
+            
+            evaluation = evaluate_subset(selected_features, F, eval_func)
+            if evaluation > best_eval:
+                best_eval = evaluation
+                best_features = np.copy(selected_features)
+        
+        Tk = update_pheromone(Tk, delta_tau, rho)
+    
+    return best_features, best_eval
 
-        row = pheromone ** self.alpha * (( 1.0 / dist) ** self.beta)
+# Example usage
+def custom_eval(subset):
 
-        norm_row = row / row.sum()
-        move = np_choice(self.all_inds, 1, p=norm_row)[0]
-        return move
+    # For illustration purposes, we'll just use the subset length as a placeholder
+    return len(subset)
+
+# Parameters and initialization
+n_features = 10  # Example feature set size
+F = np.random.rand(n_features, 100)  # Random example feature set (replace with actual feature set)
+Tk = initialize_pheromone(n_features)
+inverse_corr = np.random.rand(n_features, n_features)  # Example correlation matrix
+m = 50  # Number of ants
+delta = 0.25  # Minimum size of feature subset
+rho = 0.2  # Pheromone evaporation rate
+alpha = 0.9  # Importance of pheromone
+beta = 0.4  # Importance of feature correlation
+max_iter = 1000  # Maximum number of iterations
+
+# Running the ACO algorithm
+best_features, best_eval = ant_colony_optimization(F, m, Tk, inverse_corr, delta, rho, alpha, beta, max_iter, custom_eval)
+print("Best feature subset:", best_features)
+print("Best evaluation:", best_eval)
