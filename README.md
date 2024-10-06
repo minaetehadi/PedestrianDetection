@@ -7,6 +7,7 @@ PedestrianDetection
 - [MGAN](https://github.com/Leotju/MGAN)
 - [ALFNet](https://github.com/VideoObjectSearch/ALFNet)
 - [Feature Squeezing](https://github.com/mzweilin/EvadeML-Zoo)
+- [HSG-HIK-Lite](https://github.com/4mbilal/Object_Detector_Musawwir)
 
 
 
