@@ -14,6 +14,6 @@ PedestrianDetection
 
 1. **[Caltech Pedestrian Detection Dataset](http://www.vision.caltech.edu/Image_Datasets/CaltechPedestrians/)**
 2. **[ETH Pedestrian Dataset](https://data.vision.ee.ethz.ch/cvl/aess/dataset/)**
-3. **[CityPersons Dataset]([https://www.citypersons.net/](https://github.com/cvgroup-njust/CityPersons))**
+3. **[CityPersons Dataset](https://github.com/cvgroup-njust/CityPersons)**
 
 
