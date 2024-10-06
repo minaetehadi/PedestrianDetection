@@ -7,12 +7,10 @@ from sklearn.metrics import accuracy_score
 from art.attacks.evasion import HopSkipJump, BoundaryAttack
 from art.estimators.classification import SklearnClassifier
 
-# Load INRIA pedestrian dataset (replace 'dataset_path' with actual path)
 def load_inria_data(dataset_path, image_size=(64, 128)):
     """Loads ETH dataset."""
     X, y = [], []
     
-    # Load positive samples (pedestrians)
     pos_dir = os.path.join(dataset_path, "pos")
     for file_name in os.listdir(pos_dir):
         if file_name.endswith(".png") or file_name.endswith(".jpg"):
@@ -23,7 +21,6 @@ def load_inria_data(dataset_path, image_size=(64, 128)):
             X.append(img.flatten())  # Flatten the image to a feature vector
             y.append(1)  # Pedestrian label
 
-    # Load negative samples (background)
     neg_dir = os.path.join(dataset_path, "neg")
     for file_name in os.listdir(neg_dir):
         if file_name.endswith(".png") or file_name.endswith(".jpg"):
@@ -40,7 +37,6 @@ def load_inria_data(dataset_path, image_size=(64, 128)):
     
     return X, y
 
-# Initialize the Ant Colony Optimization parameters
 def initialize_pheromone(n_features):
 
     return np.ones((n_features, n_features))
@@ -50,11 +46,9 @@ def evaluate_subset(selected_features, X_train, y_train, X_test, y_test, eval_fu
     selected_X_train = X_train[:, selected_features == 1]
     selected_X_test = X_test[:, selected_features == 1]
 
-    # Train the model on the selected features
     model = GradientBoostingClassifier()
     model.fit(selected_X_train, y_train)
 
-    # Evaluate robustness on adversarial examples
     return eval_func(model, selected_X_test, y_test)
 
 def update_pheromone(Tk, delta_tau, rho):
@@ -74,7 +68,7 @@ def step_function(Tk, alpha, beta, current_feature, selected_features, inverse_c
                 max_attractiveness = attractiveness
                 next_feature = feature
 
-    selected_features[next_feature] = 1  # Mark the feature as selected
+    selected_features[next_feature] = 1 
     return next_feature, selected_features
 
 def adversarial_robustness(model, X_test, y_test, attack_type="hsja"):
@@ -86,17 +80,15 @@ def adversarial_robustness(model, X_test, y_test, attack_type="hsja"):
     elif attack_type == "boundary":
         attack = BoundaryAttack(classifier=classifier)
 
-    # Generate adversarial examples
     X_adv = attack.generate(X=X_test)
 
-    # Evaluate the model's accuracy on adversarial examples
     y_pred_adv = model.predict(X_adv)
     return accuracy_score(y_test, y_pred_adv)  # Return success rate on adversarial examples
 
 def ant_colony_optimization(X_train, y_train, X_test, y_test, n_features, m, delta, rho, alpha, beta, max_iter, attack_type):
-    """ACO to find the optimal robust feature subset."""
-    Tk = initialize_pheromone(n_features)  # Pheromone matrix
-    inverse_corr = np.random.rand(n_features, n_features)  # Placeholder correlation matrix
+
+    Tk = initialize_pheromone(n_features) 
+    inverse_corr = np.random.rand(n_features, n_features)
     best_eval = -1
     best_features = np.zeros(n_features)
 
@@ -113,7 +105,6 @@ def ant_colony_optimization(X_train, y_train, X_test, y_test, n_features, m, del
                 delta_tau[current_feature, next_feature] += 1
                 current_feature = next_feature
 
-            # Evaluate feature subset using adversarial robustness
             evaluation = evaluate_subset(selected_features, X_train, y_train, X_test, y_test, 
                                          lambda model, X_test, y_test: adversarial_robustness(model, X_test, y_test, attack_type))
             if evaluation > best_eval:
@@ -124,24 +115,22 @@ def ant_colony_optimization(X_train, y_train, X_test, y_test, n_features, m, del
 
     return best_features, best_eval
 
-# Load INRIA dataset (replace with actual INRIA dataset path)
 dataset_path = "path_to_inria_dataset"
 X, y = load_inria_data(dataset_path)
 
-# Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# ACO parameters
+
 n_features = X_train.shape[1]  # Number of features
 m = 50  # Number of ants
-delta = 0.25  # Minimum subset size
+delta = 0.25  
 rho = 0.2  # Evaporation rate
 alpha = 0.9  # Importance of pheromone
 beta = 0.4  # Importance of feature correlation
 max_iter = 100  # Maximum ACO iterations
-attack_type = "hsja"  # Attack type: "hsja" or "boundary"
+attack_type = "hsja" 
 
-# Running the ACO to find optimal feature subset
+
 best_features, best_eval = ant_colony_optimization(X_train, y_train, X_test, y_test, n_features, m, delta, rho, alpha, beta, max_iter, attack_type)
 
 print("Best feature subset:", best_features)
