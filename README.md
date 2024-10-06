@@ -12,7 +12,7 @@ PedestrianDetection
 
 
 ## Dataset
-
+Dataset can be downloaded from here:
 
 1. **[Caltech Pedestrian Detection Dataset](https://data.caltech.edu/records/nyy15-4j048)**
 2. **[ETH Pedestrian Dataset](https://icu.ee.ethz.ch/research/datsets.html)**
