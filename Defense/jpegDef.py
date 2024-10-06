@@ -6,7 +6,6 @@ import tensorflow as tf
 from PIL import Image
 import io
 
-# Load MNIST dataset
 (x_train, y_train), (x_test, y_test), min_pixel_value, max_pixel_value = load_data()
 
 # Define a simple CNN model for classification
