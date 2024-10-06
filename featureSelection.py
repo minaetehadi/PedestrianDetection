@@ -19,7 +19,7 @@ def load_inria_data(dataset_path, image_size=(64, 128)):
             img = cv2.resize(img, image_size)  # Resize to uniform size
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Convert to grayscale
             X.append(img.flatten())  # Flatten the image to a feature vector
-            y.append(1)  # Pedestrian label
+            y.append(1)  
 
     neg_dir = os.path.join(dataset_path, "neg")
     for file_name in os.listdir(neg_dir):
@@ -29,7 +29,7 @@ def load_inria_data(dataset_path, image_size=(64, 128)):
             img = cv2.resize(img, image_size)  # Resize to uniform size
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Convert to grayscale
             X.append(img.flatten())  # Flatten the image to a feature vector
-            y.append(0)  # Non-pedestrian label
+            y.append(0)  
     
     # Convert to numpy arrays and normalize pixel values
     X = np.array(X).astype('float32') / 255.0
@@ -115,8 +115,8 @@ def ant_colony_optimization(X_train, y_train, X_test, y_test, n_features, m, del
 
     return best_features, best_eval
 
-dataset_path = "path_to_inria_dataset"
-X, y = load_inria_data(dataset_path)
+dataset_path = "path_to_dataset"
+X, y = load_ETH_data(dataset_path)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
