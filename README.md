@@ -6,6 +6,7 @@ PedestrianDetection
 - [ART-toolbox](https://github.com/Trusted-AI/adversarial-robustness-toolbox)
 - [MGAN](https://github.com/Leotju/MGAN)
 - [ALFNet](https://github.com/VideoObjectSearch/ALFNet)
+- [Feature Squeezing](https://github.com/mzweilin/EvadeML-Zoo)
 
 
 
