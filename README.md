@@ -19,5 +19,5 @@ Dataset can be downloaded from here:
 3. **[CityPersons Dataset](https://github.com/cvgroup-njust/CityPersons)**
 
 ## General Diagram
-![Uploading image.png…]()
 
+![image](https://github.com/user-attachments/assets/499735b4-b631-463c-bd32-d2c6e45598b7)
