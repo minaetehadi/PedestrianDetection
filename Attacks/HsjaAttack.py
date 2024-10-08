@@ -40,13 +40,6 @@ def hsja(model,
 
 	stepsize_search: choose between 'geometric_progression', 'grid_search'.
 
-	max_num_evals: maximum number of evaluations for estimating gradient (for each iteration). 
-	This is not the total number of model evaluations for the entire algorithm, you need to 
-	set a counter of model evaluations by yourself to get that. To increase the total number 
-	of model evaluations, set a larger num_iterations. 
-
-	init_num_evals: initial number of evaluations for estimating gradient.
-
 	Output:
 	perturbed image.
 	
@@ -156,9 +149,6 @@ def compute_distance(x_ori, x_pert, constraint = 'l2'):
 		return np.max(abs(x_ori - x_pert))
 
 
-def approximate_gradient(model, sample, num_evals, delta, params):
-	clip_max, clip_min = params['clip_max'], params['clip_min']
-
 	# Generate random vectors.
 	noise_shape = [num_evals] + list(params['shape'])
 	if params['constraint'] == 'l2':
@@ -176,19 +166,7 @@ def approximate_gradient(model, sample, num_evals, delta, params):
 	decision_shape = [len(decisions)] + [1] * len(params['shape'])
 	fval = 2 * decisions.astype(float).reshape(decision_shape) - 1.0
 
-	# Baseline subtraction (when fval differs)
-	if np.mean(fval) == 1.0: # label changes. 
-		gradf = np.mean(rv, axis = 0)
-	elif np.mean(fval) == -1.0: # label not change.
-		gradf = - np.mean(rv, axis = 0)
-	else:
-		fval -= np.mean(fval)
-		gradf = np.mean(fval * rv, axis = 0) 
 
-	# Get the gradient direction.
-	gradf = gradf / np.linalg.norm(gradf)
-
-	return gradf
 
 
 def project(original_image, perturbed_images, alphas, params):
@@ -242,7 +220,7 @@ def binary_search_batch(original_image, perturbed_images, model, params):
 
 	out_images = project(original_image, perturbed_images, highs, params)
 
-	# (only used when stepsize_search is grid_search.)
+
 	dists = np.array([
 		compute_distance(
 			original_image, 
