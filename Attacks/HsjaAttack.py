@@ -95,13 +95,7 @@ def hsja(model,
 		num_evals = int(params['init_num_evals'] * np.sqrt(j+1))
 		num_evals = int(min([num_evals, params['max_num_evals']]))
 
-		# approximate gradient.
-		gradf = approximate_gradient(model, perturbed, num_evals, 
-			delta, params)
-		if params['constraint'] == 'linf':
-			update = np.sign(gradf)
-		else:
-			update = gradf
+	
 
 		# search step size.
 		if params['stepsize_search'] == 'geometric_progression':
