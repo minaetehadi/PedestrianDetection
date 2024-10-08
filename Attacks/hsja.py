@@ -83,8 +83,8 @@ class HopSkipJump(EvasionAttack):
         :param targeted: Should the attack target one specific class.
         :param norm: Order of the norm. Possible values: "inf", np.inf or 2.
         :param max_iter: Maximum number of iterations.
-        :param max_eval: Maximum number of evaluations for estimating gradient.
-        :param init_eval: Initial number of evaluations for estimating gradient.
+        :param max_eval: Maximum number of evaluations 
+        :param init_eval: Initial number of evaluations 
         :param init_size: Maximum number of trials for initial generation of adversarial examples.
         :param verbose: Show progress bars.
         """
@@ -574,7 +574,7 @@ class HopSkipJump(EvasionAttack):
         Compute the update in Eq.(14).
 
         :param current_sample: Current adversarial example.
-        :param num_eval: The number of evaluations for estimating gradient.
+        :param num_eval: The number of evaluations
         :param delta: The size of random perturbation.
         :param target: The target label.
         :param mask: An array with a mask to be applied to the adversarial perturbations. Shape needs to be
@@ -606,27 +606,14 @@ class HopSkipJump(EvasionAttack):
         eval_samples = np.clip(current_sample + delta * rnd_noise, clip_min, clip_max)
         rnd_noise = (eval_samples - current_sample) / delta
 
-        # Compute gradient: This is a bit different from the original paper, instead we keep those that are
-        # implemented in the original source code of the authors
+     
         satisfied = self._adversarial_satisfactory(
             samples=eval_samples, target=target, clip_min=clip_min, clip_max=clip_max
         )
         f_val = 2 * satisfied.reshape([num_eval] + [1] * len(self.estimator.input_shape)) - 1.0
         f_val = f_val.astype(ART_NUMPY_DTYPE)
 
-        if np.mean(f_val) == 1.0:
-            grad = np.mean(rnd_noise, axis=0)
-        elif np.mean(f_val) == -1.0:
-            grad = -np.mean(rnd_noise, axis=0)
-        else:
-            f_val -= np.mean(f_val)
-            grad = np.mean(f_val * rnd_noise, axis=0)
-
-        # Compute update
-        if self.norm == 2:
-            result = grad / np.linalg.norm(grad)
-        else:
-            result = np.sign(grad)
+ 
 
         return result
 
